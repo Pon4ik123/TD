@@ -321,11 +321,11 @@ public class Main {
         double b1 = 0;
         int h = 1;
         double[] tab = new double[N];
-        for(int i = 1; i <= h; i++) {
-            for (int n = 0; n <= N - 1; n++) {
+        for(int i = 0; i < N; i++) {
+            for (int n = 1; n <= h; n++) {
                 double t = (double) n / fs;
-                double up = cos(4 * PI * i * t);
-                double down = 4 * h * (sin(8 * PI * h * t) + 2);
+                double up = cos(4 * PI * n * t);
+                double down = 4 * h * (sin(8 * PI * n * t) + 2);
                 b1 += up / down;
             }
             tab[i] = b1;
@@ -370,6 +370,7 @@ public class Main {
             e.printStackTrace();
         }
     }
+
     public static void plot4_2(){
         int tc = 1;
         int fs = 22050;
@@ -377,11 +378,11 @@ public class Main {
         double b1 = 0;
         int h = 5;
         double[] tab = new double[N];
-        for(int i = 1; i <= h; i++) {
-            for (int n = 0; n <= N - 1; n++) {
+        for(int i = 0; i < N; i++) {
+            for (int n = 1; n <= h; n++) {
                 double t = (double) n / fs;
-                double up = cos(4 * PI * i * t);
-                double down = 4 * h * (sin(8 * PI * i * t) + 2);
+                double up = cos(4 * PI * n * t);
+                double down = 4 * h * (sin(8 * PI * n * t) + 2);
                 b1 += up / down;
             }
             tab[i] = b1;
@@ -434,11 +435,11 @@ public class Main {
         double b1 = 0;
         int h = 50;
         double[] tab = new double[N];
-        for(int i = 1; i <= h; i++) {
-            for (int n = 0; n <= N - 1; n++) {
+        for(int i = 0; i < N; i++) {
+            for (int n = 1; n <= h; n++) {
                 double t = (double) n / fs;
-                double up = cos(4 * PI * i * t);
-                double down = 4 * h * (sin(8 * PI * i * t) + 2);
+                double up = cos(4 * PI * n * t);
+                double down = 4 * h * (sin(8 * PI * n * t) + 2);
                 b1 += up / down;
             }
             tab[i] = b1;
