@@ -283,6 +283,7 @@ public class Main {
                 .build();
 
 
+
         XYSeries series = chart.addSeries("Wartości", null, tab);
 
         chart.getStyler().setMarkerSize(8);
