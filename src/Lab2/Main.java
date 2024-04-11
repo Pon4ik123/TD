@@ -110,7 +110,7 @@ public class Main {
 
     }
 
-    public static void plot3_1() {
+    public static void plot3_1()  {
         int N = 100;
         double fs = 100;
         int f = 2;
