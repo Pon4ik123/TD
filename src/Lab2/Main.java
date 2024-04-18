@@ -11,75 +11,75 @@ import java.awt.*;
 import java.io.IOException;
 
 import static java.lang.Math.*;
+import static java.lang.Number.*;
 
 public class Main {
     public static void plot1(){
-        int N = 7;
-        double [] realTab = new double[N];
-        double [] imageTab = new double[N];
-        int [] x = {-10, -7, -1, 0, 3, 6, 10};
-
-        for (int k = 0; k <= N-1; k++){
-            double real = 0;
-            double image = 0;
-            for (int n = 0; n <= N-1; n++){
-                double fi = (-2 * PI * k * n) / N;
-                real += x[n]*cos(fi);
-                image += x[n]*sin(fi);
+        int N = 4;
+        double[] Btab = new double[N];
+        double[] Atab = new double[N];
+        int[]x = {-4,0,-1,3};
+        for (int k = 0; k <= N-1; k++) {
+            double a = 0;
+            double b = 0;
+            for (int n = 0; n <= N-1; n++) {
+                double fi = (-2 * Math.PI * k * n) / N;
+                a += x[n]*Math.cos(fi);
+                b += x[n]*Math.sin(fi);
             }
-            realTab[k] = real;
-            imageTab[k] = image;
-
-            System.out.println("a" + k + ": " + real);
-            System.out.println("b" + k + ": " + image);
+            Atab[k] = a;
+            Btab[k] = b;
+            System.out.println("a " + k + ": " + a);
+            System.out.println("b " + k + ": " + b);
         }
     }
 
-    public static void plot2() {
-        int N = 7;
-        double fs = 2205;
-
-        double[] realTab = new double[N];
-        double[] imageTab = new double[N];
-        double[] Awidm = new double[N];
-        double[] scalarDec = new double[N];
+    public static void plot2(){
+        int N = 4;
+        double fs = 22.05;
+        double[] widmaA = new double[N];
+        double[] Btab = new double[N];
+        double[] Atab = new double[N];
+        double[] skalaDec = new double[N];
         double[] fk = new double[N];
 
-        int[] x = {-10, -7, -1, 0, 3, 6, 10};
+        int[]x = {-4,0,-1,3};
 
-        for (int k = 0; k <= (N-1)/2; k++) {
-            double real = 0;
-            double image = 0;
-            for (int n = 0; n <= N - 1; n++) {
-                double fi = (-2 * PI * k * n) / N;
-                real += x[n] * cos(fi);
-                image += x[n] * sin(fi);
+        for (int k = 0; k <= N-1; k++) {
+            double a = 0;
+            double b = 0;
+            for (int n = 0; n <= N-1; n++) {
+                double fi = (-2 * Math.PI * k * n) / N;
+                a += x[n]*Math.cos(fi);
+                b += x[n]*Math.sin(fi);
             }
-            realTab[k] = real;
-            imageTab[k] = image;
 
-            System.out.println("a" + k + ": " + real);
-            System.out.println("b" + k + ": " + image);
+            Atab[k] = a;
+            Btab[k] = b;
+            System.out.println("a " + k + ": " + a);
+            System.out.println("b " + k + ": " + b);
 
-            Awidm[k] = sqrt(real*real + image*image);
-            System.out.println("A: " + Awidm[k]);
+            widmaA[k] = Math.sqrt(a*a + b*b);
+            System.out.println("WidmaA: " + widmaA[k]);
 
-            scalarDec[k] = 10 * log10(Awidm[k]);
-            System.out.println("Scalar Dec: " + scalarDec[k]);
+            skalaDec[k] = 10 * Math.log10(widmaA[k]);
+            System.out.println("SkalaDec: " + skalaDec[k]);
 
-            fk[k] = k / (fs/N);
-            System.out.println("fk: " + fk[k]);
+            fk[k] = k * (fs/N);
+            System.out.println("Skala Czestotliwosci: " + fk[k]);
+
         }
 
-        XYChart chart = new XYChartBuilder()
-                .width(800)
-                .height(600)
-                .title("Wykres funkcji")
-                .xAxisTitle("Czas")
-                .yAxisTitle("Wartość")
-                .build();
+        XYChart chart = new XYChartBuilder().
+                width(800).
+                height(600).
+                title("Wykres funkcji").
+                xAxisTitle("Czas").
+                yAxisTitle("Wartość").
+                build();
 
-        XYSeries series = chart.addSeries("Wartości", null, Awidm);
+
+        XYSeries series = chart.addSeries("Wartości", null, skalaDec);
 
         chart.getStyler().setMarkerSize(8);
         chart.getStyler().setCursorColor(XChartSeriesColors.BLUE);
@@ -107,12 +107,11 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
-    public static void plot3_1()  {
-        int N = 100;
-        double fs = 100;
+    public static void plot3(){
+        int N = 110;
+        double fs = 110;
         int f = 2;
 
         double[] realTab_x = new double[N];
@@ -157,58 +156,59 @@ public class Main {
                 double z = x * cos(2 * PI * pow(t, 2) + PI) + 0.276 * pow(t, 2) * x;
                 double v = sqrt(abs(1.77 - y + z) * cos(5.2 * PI * t) + x + 4);
 
-                real_x += x * cos(fi);
-                image_x += x * sin(fi);
-                real_y += y * cos(fi);
-                image_y += y * sin(fi);
-                real_z += z * cos(fi);
-                image_z += z * sin(fi);
-                real_v += v * cos(fi);
-                image_v += v * sin(fi);
+                real_x += x * cos(x);
+                image_x += x * sin(x);
+                real_y += y * cos(y);
+                image_y += y * sin(y);
+                real_z += z * cos(z);
+                image_z += z * sin(z);
+                real_v += v * cos(v);
+                image_v += v * sin(v);
             }
             realTab_x[k] = real_x;
             imageTab_x[k] = image_x;
             System.out.println("a" + k + ": " + real_x);
             System.out.println("b" + k + ": " + image_x);
+
             Awidm_x[k] = sqrt(real_x*real_x + image_x*image_x);
-            System.out.println("A: " + Awidm_x[k]);
+//            System.out.println("A: " + Awidm_x[k]);
             scalarDec_x[k] = 10 * log10(Awidm_x[k]);
-            System.out.println("Scalar Dec: " + scalarDec_x[k]);
+//            System.out.println("Scalar Dec: " + scalarDec_x[k]);
             fk_x[k] = k / (fs/N);
-            System.out.println("fk: " + fk_x[k]);
+//            System.out.println("fk: " + fk_x[k]);
 
             realTab_y[k] = real_y;
             imageTab_y[k] = image_y;
-            System.out.println("a" + k + ": " + real_y);
-            System.out.println("b" + k + ": " + image_y);
+//            System.out.println("a" + k + ": " + real_y);
+//            System.out.println("b" + k + ": " + image_y);
             Awidm_y[k] = sqrt(real_y*real_y + image_y*image_y);
-            System.out.println("A: " + Awidm_y[k]);
+//            System.out.println("A: " + Awidm_y[k]);
             scalarDec_y[k] = 10 * log10(Awidm_y[k]);
-            System.out.println("Scalar Dec: " + scalarDec_y[k]);
+//            System.out.println("Scalar Dec: " + scalarDec_y[k]);
             fk_y[k] = k / (fs/N);
-            System.out.println("fk: " + fk_y[k]);
+//            System.out.println("fk: " + fk_y[k]);
 
             realTab_z[k] = real_z;
             imageTab_z[k] = image_z;
-            System.out.println("a" + k + ": " + real_z);
-            System.out.println("b" + k + ": " + image_z);
+//            System.out.println("a" + k + ": " + real_z);
+//            System.out.println("b" + k + ": " + image_z);
             Awidm_z[k] = sqrt(real_z*real_z + image_z*image_z);
-            System.out.println("A: " + Awidm_z[k]);
+//            System.out.println("A: " + Awidm_z[k]);
             scalarDec_z[k] = 10 * log10(Awidm_z[k]);
-            System.out.println("Scalar Dec: " + scalarDec_z[k]);
+//            System.out.println("Scalar Dec: " + scalarDec_z[k]);
             fk_z[k] = k / (fs/N);
-            System.out.println("fk: " + fk_z[k]);
+//            System.out.println("fk: " + fk_z[k]);
 
             realTab_v[k] = real_v;
             imageTab_v[k] = image_v;
-            System.out.println("a" + k + ": " + real_v);
-            System.out.println("b" + k + ": " + image_v);
+//            System.out.println("a" + k + ": " + real_v);
+//            System.out.println("b" + k + ": " + image_v);
             Awidm_x[k] = sqrt(real_v*real_v + image_v*image_v);
-            System.out.println("A: " + Awidm_v[k]);
+//            System.out.println("A: " + Awidm_v[k]);
             scalarDec_v[k] = 10 * log10(Awidm_v[k]);
-            System.out.println("Scalar Dec: " + scalarDec_v[k]);
+//            System.out.println("Scalar Dec: " + scalarDec_v[k]);
             fk_v[k] = k / (fs/N);
-            System.out.println("fk: " + fk_v[k]);
+//            System.out.println("fk: " + fk_v[k]);
         }
 
         XYChart chart_x = new XYChartBuilder()
@@ -361,7 +361,6 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        plot2();
-        plot3_1();
+        plot3();
     }
 }
