@@ -6,6 +6,7 @@ import org.knowm.xchart.XYChartBuilder;
 import org.knowm.xchart.XYSeries;
 import org.knowm.xchart.style.Styler;
 import org.knowm.xchart.style.colors.XChartSeriesColors;
+import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 
 import java.awt.*;
 import java.io.IOException;
@@ -38,7 +39,7 @@ public class Main {
 
             za[i] = (ka * mt[i] + 1) * cos(2 * PI * fn * t);
             zp[i] = cos(2 * PI * fn * t + kp * mt[i]);
-            zf[i] = cos(2 * PI * fn * t + (kf /fm) * mt[i]);
+            zf[i] = cos(2 * PI * fn * t + (kf / fm) * mt[i]);
 
             tab_a[i] += za[i];
             tab_p[i] += zp[i];
@@ -46,8 +47,8 @@ public class Main {
         }
 
         XYChart chart_a = new XYChartBuilder()
-                .width(800)
-                .height(600)
+                .width(1920)
+                .height(1080)
                 .title("Wykres funkcji")
                 .xAxisTitle("Czas")
                 .yAxisTitle("Wartość")
@@ -78,14 +79,14 @@ public class Main {
 
 
         try {
-            BitmapEncoder.saveBitmap(chart_a, "za.png", BitmapEncoder.BitmapFormat.PNG);
+            BitmapEncoder.saveBitmap(chart_a, "za_c.png", BitmapEncoder.BitmapFormat.PNG);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         XYChart chart_p = new XYChartBuilder()
-                .width(800)
-                .height(600)
+                .width(1920)
+                .height(1080)
                 .title("Wykres funkcji")
                 .xAxisTitle("Czas")
                 .yAxisTitle("Wartość")
@@ -116,14 +117,14 @@ public class Main {
 
 
         try {
-            BitmapEncoder.saveBitmap(chart_p, "zp.png", BitmapEncoder.BitmapFormat.PNG);
+            BitmapEncoder.saveBitmap(chart_p, "zp_c.png", BitmapEncoder.BitmapFormat.PNG);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         XYChart chart_f = new XYChartBuilder()
-                .width(800)
-                .height(600)
+                .width(1920)
+                .height(1080)
                 .title("Wykres funkcji")
                 .xAxisTitle("Czas")
                 .yAxisTitle("Wartość")
@@ -154,7 +155,7 @@ public class Main {
 
 
         try {
-            BitmapEncoder.saveBitmap(chart_f, "zf.png", BitmapEncoder.BitmapFormat.PNG);
+            BitmapEncoder.saveBitmap(chart_f, "zf_c.png", BitmapEncoder.BitmapFormat.PNG);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -167,6 +168,12 @@ public class Main {
         double[] widmaP = new double[N];
         double[] widmaF = new double[N];
 
+        DoubleFFT_1D fftA = new DoubleFFT_1D(N);
+        fftA.realForward(za);
+        DoubleFFT_1D fftP = new DoubleFFT_1D(N);
+        fftP.realForward(zp);
+        DoubleFFT_1D fftF = new DoubleFFT_1D(N);
+        fftF.realForward(zf);
 
         for (int k = 0; k < N; k++) {
             double realVal = 0;
@@ -208,8 +215,8 @@ public class Main {
         }
 
         XYChart chart_widmaA = new XYChartBuilder()
-                .width(800)
-                .height(600)
+                .width(1920)
+                .height(1080)
                 .title("Wykres funkcji")
                 .xAxisTitle("Czas")
                 .yAxisTitle("Wartość")
@@ -240,14 +247,14 @@ public class Main {
 
 
         try {
-            BitmapEncoder.saveBitmap(chart_widmaA, "widmaA.png", BitmapEncoder.BitmapFormat.PNG);
+            BitmapEncoder.saveBitmap(chart_widmaA, "za_c_widmo.png", BitmapEncoder.BitmapFormat.PNG);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         XYChart chart_widmaF = new XYChartBuilder()
-                .width(800)
-                .height(600)
+                .width(1920)
+                .height(1080)
                 .title("Wykres funkcji")
                 .xAxisTitle("Czas")
                 .yAxisTitle("Wartość")
@@ -278,14 +285,14 @@ public class Main {
 
 
         try {
-            BitmapEncoder.saveBitmap(chart_widmaF, "widmaF.png", BitmapEncoder.BitmapFormat.PNG);
+            BitmapEncoder.saveBitmap(chart_widmaF, "zf_c_widmo.png", BitmapEncoder.BitmapFormat.PNG);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         XYChart chart_widmaP = new XYChartBuilder()
-                .width(800)
-                .height(600)
+                .width(1920)
+                .height(1080)
                 .title("Wykres funkcji")
                 .xAxisTitle("Czas")
                 .yAxisTitle("Wartość")
@@ -316,7 +323,7 @@ public class Main {
 
 
         try {
-            BitmapEncoder.saveBitmap(chart_widmaF, "widmaP.png", BitmapEncoder.BitmapFormat.PNG);
+            BitmapEncoder.saveBitmap(chart_widmaP, "zp_c_widmo.png", BitmapEncoder.BitmapFormat.PNG);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -325,6 +332,32 @@ public class Main {
 
 
     public static void main(String[] args) {
-        plot1(20, 1, 0.5, 0.5, 0.5);
+//        plot1(20, 1, 30, 10, 10);
+        int[] a = {1, 2, 3, 4, 4, 5, 6};
+        int k = 5;
+        rotate(a, k);
     }
+
+    private static void rotate(int[] a, int k) {
+        int[] rotateK = new int[k];
+        int[] rotateA = new int [a.length-k];
+        int[] result = new int [rotateA.length + rotateK.length];
+
+        for (int i = 0; i < k; i++) {
+            rotateK[k-i-1] = a[a.length-1-i];
+        }
+        System.out.println(Arrays.toString(rotateK));
+
+        for (int i = 0; i < rotateA.length; i++) {
+            rotateA[i] = a[i];
+        }
+        System.out.println(Arrays.toString(rotateA));
+
+        System.arraycopy(rotateK, 0, result, 0, rotateK.length);
+        System.out.println(Arrays.toString(result));
+        System.arraycopy(rotateA, 0, result, rotateK.length, rotateA.length);
+        System.out.println(Arrays.toString(result));
+
+    }
+
 }
