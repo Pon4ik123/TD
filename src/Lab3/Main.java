@@ -11,6 +11,7 @@ import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 import java.awt.*;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 
 import static java.lang.Math.*;
 import static java.lang.Math.PI;
@@ -168,6 +169,8 @@ public class Main {
         double[] widmaP = new double[N];
         double[] widmaF = new double[N];
 
+        double[] fk = new double[N];
+
         DoubleFFT_1D fftA = new DoubleFFT_1D(N);
         fftA.realForward(za);
         DoubleFFT_1D fftP = new DoubleFFT_1D(N);
@@ -186,6 +189,7 @@ public class Main {
 
             widmaA[k] = sqrt(realVal*realVal + imageValue*imageValue);
             skalaDecA[k] = 10 * log10(widmaA[k]);
+            fk[k] = k * (fs/N);
         }
 
         for (int k = 0; k < N; k++) {
@@ -327,37 +331,90 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        double width = 0;
+        int BD3 = 3;
+        for (int i = 0; i < widmaA.length; i++) {
+            if (widmaA[i] >= Arrays.stream(widmaA).max().getAsDouble()-BD3){
+                width = fk[i]*2;
+            }
+        }
+        System.out.println("Width for BD3 widma A = " + width);
+
+        width = 0;
+        for (int i = 0; i < widmaP.length; i++) {
+            if (widmaP[i] >= Arrays.stream(widmaP).max().getAsDouble()-BD3){
+                width = fk[i]*2;
+            }
+        }
+        System.out.println("Width for BD3 widma P = " + width);
+
+        width = 0;
+        for (int i = 0; i < widmaF.length; i++) {
+            if (widmaF[i] >= Arrays.stream(widmaF).max().getAsDouble()-BD3){
+                width = fk[i]*2;
+            }
+        }
+        System.out.println("Width BD3 bd3 widma F = " + width);
+
+
+
+        int BD6 = 6;
+        width = 0;
+        for (int i = 0; i < widmaA.length; i++) {
+            if (widmaA[i] >= Arrays.stream(widmaA).max().getAsDouble()-BD6){
+                width = fk[i]*2;
+            }
+        }
+        System.out.println("Width for BD6 widma A = " + width);
+
+        width = 0;
+        for (int i = 0; i < widmaP.length; i++) {
+            if (widmaP[i] >= Arrays.stream(widmaP).max().getAsDouble()-BD6){
+                width = fk[i]*2;
+            }
+        }
+        System.out.println("Width for BD6 widma P = " + width);
+
+        width = 0;
+        for (int i = 0; i < widmaF.length; i++) {
+            if (widmaF[i] >= Arrays.stream(widmaF).max().getAsDouble()-BD6){
+                width = fk[i]*2;
+            }
+        }
+        System.out.println("Width for BD6 widma F = " + width);
+
+
+        int BD12 = 12;
+        width = 0;
+        for (int i = 0; i < widmaA.length; i++) {
+            if (widmaA[i] >= Arrays.stream(widmaA).max().getAsDouble()-BD12){
+                width = fk[i]*2;
+            }
+        }
+        System.out.println("Width for BD12 widma A = " + width);
+
+        width = 0;
+        for (int i = 0; i < widmaP.length; i++) {
+            if (widmaP[i] >= Arrays.stream(widmaP).max().getAsDouble()-BD12){
+                width = fk[i]*2;
+            }
+        }
+        System.out.println("Width for BD12 widma P = " + width);
+
+        width = 0;
+        for (int i = 0; i < widmaF.length; i++) {
+            if (widmaF[i] >= Arrays.stream(widmaF).max().getAsDouble()-BD12){
+                width = fk[i]*2;
+            }
+        }
+        System.out.println("Width for BD12 widma F = " + width);
+
     }
 
 
 
     public static void main(String[] args) {
-//        plot1(20, 1, 30, 10, 10);
-        int[] a = {1, 2, 3, 4, 4, 5, 6};
-        int k = 5;
-        rotate(a, k);
+        plot1(20, 1, 30, 10, 10);
     }
-
-    private static void rotate(int[] a, int k) {
-        int[] rotateK = new int[k];
-        int[] rotateA = new int [a.length-k];
-        int[] result = new int [rotateA.length + rotateK.length];
-
-        for (int i = 0; i < k; i++) {
-            rotateK[k-i-1] = a[a.length-1-i];
-        }
-        System.out.println(Arrays.toString(rotateK));
-
-        for (int i = 0; i < rotateA.length; i++) {
-            rotateA[i] = a[i];
-        }
-        System.out.println(Arrays.toString(rotateA));
-
-        System.arraycopy(rotateK, 0, result, 0, rotateK.length);
-        System.out.println(Arrays.toString(result));
-        System.arraycopy(rotateA, 0, result, rotateK.length, rotateA.length);
-        System.out.println(Arrays.toString(result));
-
-    }
-
 }
