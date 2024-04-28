@@ -73,7 +73,6 @@ public class Main {
                     zf[j+ofs2] = sin(2 * PI * fn1 * t);
                 }
             }
-
             ofs2 = ofs2 + tbp;
         }
 
