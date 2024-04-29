@@ -1,5 +1,6 @@
 package Lab4;
 
+import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 import org.knowm.xchart.BitmapEncoder;
 import org.knowm.xchart.XYChart;
 import org.knowm.xchart.XYChartBuilder;
@@ -8,8 +9,8 @@ import org.knowm.xchart.style.markers.SeriesMarkers;
 
 import java.io.IOException;
 
-import static java.lang.Math.PI;
-import static java.lang.Math.sin;
+import static java.lang.Math.*;
+import static java.lang.Math.log10;
 
 public class Main {
     public static void plot1(){
@@ -19,12 +20,12 @@ public class Main {
         double tb = tc / bit.length;
         int N = (int) (fs * tc);
         int w = 2;
-        double a1 =  0.2;
-        double a2 =  0.5;
-        double fn = w *(1/tb);
+        double a1 =  0.5;
+        double a2 =  1.0;
+        double fn = w * (1/tb);
         int tbp = (int) (tb * fs);
 
-        double[] za = new double[N];
+        double[] za = new double[N*2];
         int ofs = 0;
         for (int i = 0; i <bit.length; i++) {
             int bitIndex = bit[i];
@@ -42,7 +43,7 @@ public class Main {
         }
 
         int ofs1 = 0;
-        double[] zp = new double[N];
+        double[] zp = new double[N*2];
         for (int i = 0; i <bit.length; i++) {
             int bitIndex = bit[i];
             for(int j = 0;j<tbp;j++) {
@@ -59,7 +60,7 @@ public class Main {
         }
 
         int ofs2 = 0;
-        double[] zf = new double[N];
+        double[] zf = new double[N*2];
         double fn1 = (w + 1) / tb;
         double fn2 = (w + 2) / tb;
         for (int i = 0; i <bit.length; i++) {
@@ -76,13 +77,13 @@ public class Main {
             ofs2 = ofs2 + tbp;
         }
 
-        XYChart chartA = new XYChartBuilder().width(1920).height(1080).title("Sygnały zat").xAxisTitle("Czas").yAxisTitle("Wartość").build();
+        XYChart chartA = new XYChartBuilder().width(1920).height(1080).title("Sygnały za").xAxisTitle("Czas").yAxisTitle("Wartość").build();
         XYSeries seriesA = (XYSeries) chartA.addSeries("Wartości", null, za).setMarker(SeriesMarkers.NONE);
 
-        XYChart chartP = new XYChartBuilder().width(1920).height(1080).title("Sygnały zpt").xAxisTitle("Czas").yAxisTitle("Wartość").build();
+        XYChart chartP = new XYChartBuilder().width(1920).height(1080).title("Sygnały zp").xAxisTitle("Czas").yAxisTitle("Wartość").build();
         XYSeries seriesP = (XYSeries) chartP.addSeries("Wartości", null, zp).setMarker(SeriesMarkers.NONE);
 
-        XYChart chartF = new XYChartBuilder().width(1920).height(1080).title("Sygnały zft").xAxisTitle("Czas").yAxisTitle("Wartość").build();
+        XYChart chartF = new XYChartBuilder().width(1920).height(1080).title("Sygnały zf").xAxisTitle("Czas").yAxisTitle("Wartość").build();
         XYSeries seriesF = (XYSeries) chartF.addSeries("Wartości", null, zf).setMarker(SeriesMarkers.NONE);
 
         try {
@@ -92,7 +93,57 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        DoubleFFT_1D fftA = new DoubleFFT_1D(N);
+        fftA.complexForward(za);
+
+        DoubleFFT_1D fftP = new DoubleFFT_1D(N);
+        fftP.complexForward(zp);
+
+        DoubleFFT_1D fftF = new DoubleFFT_1D(N);
+        fftF.complexForward(zf);
+
+        // Calculate magnitude spectra
+        double[] widmaA = new double[N / 2 + 1];
+        double[] widmaP = new double[N / 2 + 1];
+        double[] widmaF = new double[N / 2 + 1];
+
+        for (int k = 0; k < widmaA.length; k++) {
+            double realVal = za[2 * k];
+            double imagVal = za[2 * k + 1];
+            widmaA[k] = Math.sqrt(realVal * realVal + imagVal * imagVal);
+        }
+
+        for (int k = 0; k < widmaP.length; k++) {
+            double realVal = zp[2 * k];
+            double imagVal = zp[2 * k + 1];
+            widmaP[k] = Math.sqrt(realVal * realVal + imagVal * imagVal);
+        }
+
+        for (int k = 0; k < widmaF.length; k++) {
+            double realVal = zf[2 * k];
+            double imagVal = zf[2 * k + 1];
+            widmaF[k] = Math.sqrt(realVal * realVal + imagVal * imagVal);
+        }
+
+        XYChart chartWiadmaA = new XYChartBuilder().width(1920).height(1080).title("Sygnały za_widmo").xAxisTitle("Czas").yAxisTitle("Wartość").build();
+        XYSeries seriesWidmaA = (XYSeries) chartWiadmaA.addSeries("Wartości", null, widmaA).setMarker(SeriesMarkers.NONE);
+
+        XYChart chartWidmaP = new XYChartBuilder().width(1920).height(1080).title("Sygnały zp_widmo").xAxisTitle("Czas").yAxisTitle("Wartość").build();
+        XYSeries seriesWidmaP = (XYSeries) chartWidmaP.addSeries("Wartości", null, widmaP).setMarker(SeriesMarkers.NONE);
+
+        XYChart chartWidmaF = new XYChartBuilder().width(1920).height(1080).title("Sygnały zf_widmo").xAxisTitle("Czas").yAxisTitle("Wartość").build();
+        XYSeries seriesWidmaF = (XYSeries) chartWidmaF.addSeries("Wartości", null, widmaF).setMarker(SeriesMarkers.NONE);
+
+        try {
+            BitmapEncoder.saveBitmap(chartWiadmaA, "za_widmo.png", BitmapEncoder.BitmapFormat.PNG);
+            BitmapEncoder.saveBitmap(chartWidmaP, "zp_widmo.png", BitmapEncoder.BitmapFormat.PNG);
+            BitmapEncoder.saveBitmap(chartWidmaF, "zf_widmo.png", BitmapEncoder.BitmapFormat.PNG);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
     public static void main(String[] args) {
         plot1();
     }
