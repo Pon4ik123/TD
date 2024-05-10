@@ -16,6 +16,7 @@ import static java.lang.Math.log10;
 public class Main {
 
     public static double function(double x) {
+
         return x;
     }
 
