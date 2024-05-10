@@ -15,18 +15,6 @@ import static java.lang.Math.*;
 
 public class Main {
 
-//    public static double width(double[] mp, double[] fk, int N){
-//        OptionalDouble max3dbOptional = Arrays.stream(mp).max();
-//        double max3db = max3dbOptional.getAsDouble() - 3;
-//
-//        double fmax = 0;
-//        for (int i = N - 1; i >= 0; i--) {
-//            if (mp[i] >= max3db && max3db >= mp[i-1]){
-//                fmax =;
-//                break;
-//            }
-//        }
-//    }
 public static double width(double[] fk, double[] widma, double bdb) {
     double maxAmplitude = Arrays.stream(widma).max().getAsDouble();
     double max_bdb = maxAmplitude - bdb;
