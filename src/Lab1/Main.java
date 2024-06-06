@@ -9,8 +9,6 @@ import org.knowm.xchart.style.colors.XChartSeriesColors;
 
 import java.awt.*;
 import java.io.IOException;
-import java.lang.Math.*;
-
 import static java.lang.Math.*;
 
 public class Main {
