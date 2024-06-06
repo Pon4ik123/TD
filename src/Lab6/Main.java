@@ -75,5 +75,6 @@ public class Main {
 
         System.out.print("Enter the word for Haming(15, 11): ");
         word = new Scanner(System.in).nextLine();
+
     }
 }
