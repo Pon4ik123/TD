@@ -1,8 +1,6 @@
 package Lab6;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Main {
     public static List<Integer> stringToBinary(String word){
@@ -20,12 +18,11 @@ public class Main {
         return bin;
     }
 
-    public static void haming(int n, int k){
-        int m = n - k;
-        List<Integer> originalBites = stringToBinary("zut");
+    public static void haming(int n, int k, boolean triger, String word){
+        List<Integer> originalBites = stringToBinary(word);
         List<Integer> tempBits = new ArrayList<>(originalBites);
 
-        System.out.print("Entered bites: " + tempBits + "\n");
+        System.out.println("Entered bites: " + tempBits);
 
         int x1 = tempBits.get(0) ^ tempBits.get(1) ^ tempBits.get(3);
         int x2 = tempBits.get(0) ^ tempBits.get(2) ^ tempBits.get(3);
@@ -42,6 +39,17 @@ public class Main {
         result.set(6, tempBits.get(3));
         System.out.println("Chosen word: " + result);
 
+        if(triger) {
+            int randomIndex = new Random().nextInt(result.size()-1);
+            while(randomIndex == 0 || randomIndex == 1 || randomIndex == 3){
+                randomIndex = new Random().nextInt(tempBits.size()-1);
+            }
+            if(result.get(randomIndex) == 1){
+                result.set(randomIndex, 0);
+            } else result.set(randomIndex, 1);
+            System.out.println("Chosen word after error: " + result);
+        }
+
         int x1P = result.get(2) ^ result.get(4) ^ result.get(6);
         int x2P = result.get(2) ^ result.get(5) ^ result.get(6);
         int x4P = result.get(4) ^ result.get(5) ^ result.get(6);
@@ -52,10 +60,20 @@ public class Main {
 
         int s = (int) (x1_ * Math.pow(2, 0) + x2_ * Math.pow(2, 1) + x4_ * Math.pow(2, 2));
         if (s == 0) System.out.println("There is no mistake");
-        else System.out.println("The mistake is in: " + s + " bite");
+        else {
+            System.out.println("The mistake is in: " + s + " bite");
+            if(result.get(s-1) == 1) result.set(s-1, 0);
+            else result.set(s-1, 1);
+            System.out.println("After clearing error: " + result);
+        }
     }
 
     public static void main(String[] args) {
-        haming(7, 0);
+        System.out.print("Enter the word for Haming(7, 4): ");
+        String word = new Scanner(System.in).nextLine();
+        haming(7, 4, true, word);
+
+        System.out.print("Enter the word for Haming(15, 11): ");
+        word = new Scanner(System.in).nextLine();
     }
 }
