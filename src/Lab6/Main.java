@@ -251,11 +251,18 @@ public class Main {
         System.out.println("Matrix HTranspose size: " + HTranspose.length + "x" + HTranspose[0].length);
         System.out.println();
 
-        int[] c = new int[G.length];
-        for (int i = 0; i < G.length; i++) {
-            for (int j = 0; j < G[0].length; j++) {
-                c[i] += G[i][j] * K.get(i);
+        int[] c = new int[G[0].length];
+//        for (int i = 0; i < G.length; i++) {
+//            for (int j = 0; j < G[0].length; j++) {
+//                c[i] += G[i][j] * K.get(i);
+//            }
+//        }
+        for (int i = 0; i < 15; i++) {
+            int sum = 0;
+            for (int j = 0; j < 11; j++) {
+                sum += G[j][i] * K.get(j);
             }
+            c[i] = sum % 2;
         }
         System.out.println("Array c: ");
         System.out.println(Arrays.toString(c));
