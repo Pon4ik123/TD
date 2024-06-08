@@ -227,6 +227,5 @@ public class Main {
 //        System.out.print("Enter [1] if you want to make change one bit, [0] - don't want to: ");
 //        int choice = new Scanner(System.in).nextInt();
 //        haming15_11(15, 11, string, choice);
-
     }
 }
