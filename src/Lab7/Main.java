@@ -6,7 +6,6 @@ import org.knowm.xchart.XYChartBuilder;
 import org.knowm.xchart.style.markers.SeriesMarkers;
 
 import java.io.IOException;
-import java.time.Year;
 import java.util.*;
 
 import static java.lang.Math.PI;
@@ -14,7 +13,7 @@ import static java.lang.Math.sin;
 
 public class Main {
     public static double fs = 2000;
-    public static double tc = 1.0;
+    public static double tc = 6.0;
     public static int N = (int) (fs * tc);
     public static int w = 2;
     public static double a1 = 1;
@@ -55,31 +54,45 @@ public class Main {
         return result;
     }
 
-    public static List<Integer> askModulation (List<Integer> bits){
-        double tb = tc / bits.size();
-        double fn = w * (1 / tb);
-        int tbp = (int) (tb * fs);
+    public static List<Double> askModulation (List<Integer> bits){
+        Main.tb = tc / bits.size();
+        Main.fn = (1 / tb);
+        Main.tbp = (int) (tb * fs);
 
         double[] za = new double[N];
         int ofs = 0;
         for (int i = 0; i < bits.size(); i++) {
             int bitIndex = bits.get(i);
             for (int j = 0; j < tbp; j++) {
-                double t = (double) (i * ofs + j) / fs;
+                double t =(j + tbp*i)  / fs;
 
                 if (bitIndex == 1) {
-                    za[j + ofs] = a2 * sin(2 * PI * fn * t);
+                    za[j + ofs] = a1 * Math.sin(2 * PI * fn * t);
                 } else {
-                    za[j + ofs] = a1 * sin(2 * PI * fn * t);
+                    za[j + ofs] = a2 * Math.sin(2 * PI * fn * t);
                 }
             }
 
             ofs = ofs + tbp;
         }
 
+        return transmisionZad2(za, whiteNoise(za.length),8);
+//        return transmisionZad1(za, whiteNoise(za.length),8);
+    }
+
+    public static List<Double> transmisionZad1(double[] ASK, double[] whiteNoise, int alfa) {
+        List<Double> yASK = new ArrayList<>();
+        for (int i = 0; i < ASK.length; i++) {
+            yASK.add(ASK[i] + alfa * whiteNoise[i]);
+        }
+
+        return yASK;
+    }
+
+    public static List<Integer> demodulationASK(List<Double> za) {
         double[] zASK = new double[N];
         for (int i = 0; i < zASK.length; i++) {
-            zASK[i] = sin(2 * PI * fn * i / fs) * za[i];
+            zASK[i] =   za.get(i) * Math.sin(2 * PI * fn * i / fs) ;
         }
 
         double[] pASK = new double[N];
@@ -98,53 +111,58 @@ public class Main {
         for (int i = 0; i < tb*fs && i < N; i++) {
             h += pASK[i];
         }
-        h /= tb*fs;
+        h = 30;
 
         double[] cASK = new double[N];
         for (int i = 0; i < N; i++) {
             cASK[i] = pASK[i] > h ? 1 : 0;
         }
 
-        List<Integer> c = new ArrayList<>();
-        for (double v : cASK) {
-            c.add((int) v);
-        }
-
-        XYChart chartCASK = new XYChartBuilder().width(1920).height(1080).title("Sygnały za").xAxisTitle("Czas").yAxisTitle("Wartość").build();
-        chartCASK.addSeries("Wartości", null, cASK).setMarker(SeriesMarkers.NONE);
-
-        try {
-            BitmapEncoder.saveBitmap(chartCASK, "src/Lab7/ASK.png", BitmapEncoder.BitmapFormat.PNG);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return c;
-    }
-
-    public static List<Double> transmisionZad1(List<Integer> ASK, double[] whiteNoise, int alfa) {
-        List<Double> yASK = new ArrayList<>();
-        for (int i = 0; i < ASK.size(); i++) {
-            yASK.add(ASK.get(i) + alfa * whiteNoise[i]);
-        }
-
-        return yASK;
-    }
-
-    public static List<Integer> demodulationASK(List<Double> yASK) {
         List<Integer> counterASK = new ArrayList<>();
         int oneCounterASK = 0;
         for (int i = 0; i < 84; i++) {
             for (int j = i*Main.tbp; j < Main.tbp+Main.tbp*i; j++) {
-                if (yASK.get(i) == 1) oneCounterASK++;
-            }
-            if (oneCounterASK >= Main.tbp/2-1) counterASK.add(1);
-            else counterASK.add(0);
 
+                if (cASK[j] == 1) oneCounterASK++;
+
+            }
+            if (oneCounterASK > Main.tbp/2-1) {
+                counterASK.add(1);
+            } else {counterASK.add(0);}
             oneCounterASK = 0;
         }
 
         return counterASK;
+    }
+
+    public static double bitErrorRate(List<Integer> codedBits, List<Integer> decodedBits) {
+        int error = 0;
+        for (int i = 0; i < codedBits.size(); i++) {
+            if(!Objects.equals(codedBits.get(i), decodedBits.get(i))){
+                error++;
+            }
+        }
+        return (double) error / codedBits.size();
+    }
+
+    public static List<Double> transmisionZad2(double[] ASK, double[] whiteNoise, int beta) {
+        List<Double> yASK = new ArrayList<>();
+        double[] e = new double[ASK.length];
+        for (int i = 0; i < ASK.length; i++) {
+            yASK.add(ASK[i] * Math.exp(-beta * i));
+            e[i] = Math.exp(-beta * i);
+        }
+
+        XYChart chartCASK = new XYChartBuilder().width(1920).height(1080).title("Sygnały za").xAxisTitle("Czas").yAxisTitle("Wartość").build();
+        chartCASK.addSeries("Wartości", null, e).setMarker(SeriesMarkers.NONE);
+
+        try {
+            BitmapEncoder.saveBitmap(chartCASK, "src/Lab7/Exp.png", BitmapEncoder.BitmapFormat.PNG);
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+
+        return yASK;
     }
 
     public static double[] whiteNoise(int length) {
@@ -203,18 +221,12 @@ public class Main {
         System.out.println();
         System.out.println("Coded bits: " + codedBits);
 
-        Main.tb = Main.tc / codedBits.size();
-        Main.fn = Main.w * (1 / Main.tb);
-        Main.tbp = (int) (tb * fs);
+        List<Double> ASK = askModulation(codedBits);
 
-        List<Integer> ASK = askModulation(codedBits);
-
-        double[] whiteNoise = whiteNoise(ASK.size());
-
-        List<Double> yASK = transmisionZad1(ASK, whiteNoise, 0);
-
+        List<Integer> demodulatedBits = demodulationASK(ASK);
         System.out.println();
-        System.out.println(demodulationASK(yASK));
+        System.out.println(demodulatedBits);
 
+        System.out.println(bitErrorRate(codedBits, demodulatedBits));
     }
 }
