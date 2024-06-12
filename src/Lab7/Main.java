@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.*;
 
 import static java.lang.Math.PI;
-import static java.lang.Math.sin;
 
 public class Main {
     public static double fs = 2000;
@@ -76,11 +75,13 @@ public class Main {
             ofs = ofs + tbp;
         }
 
-      //  return transmisionZad2(za, whiteNoise(za.length),8);
-        return transmisionZad1(za, whiteNoise(za.length),0);
+        return transmisionZad2(za, whiteNoise(za.length),0);
+//        return transmisionZad3(za, whiteNoise(za.length),8);
+//        return transmisionZad4_1(za, whiteNoise(za.length), 0, 8);
+//        return transmisionZad4_2(za, whiteNoise(za.length), 0, 8);
     }
 
-    public static List<Double> transmisionZad1(double[] ASK, double[] whiteNoise, int alfa) {
+    public static List<Double> transmisionZad2(double[] ASK, double[] whiteNoise, int alfa) {
         List<Double> yASK = new ArrayList<>();
         for (int i = 0; i < ASK.length; i++) {
             yASK.add(ASK[i] + alfa * whiteNoise[i]);
@@ -89,10 +90,37 @@ public class Main {
         return yASK;
     }
 
+    public static List<Double> transmisionZad3(double[] ASK, double[] whiteNoise, int beta) {
+        List<Double> yASK = new ArrayList<>();
+        for (int i = 0; i < ASK.length; i++) {
+            yASK.add(ASK[i] * Math.exp(-beta * i));
+        }
+
+        return yASK;
+    }
+
+    public static List<Double> transmisionZad4_1(double[] ASK, double[] whiteNoise, int alfa, int beta) {
+        List<Double> yASK = new ArrayList<>();
+        for (int i = 0; i < ASK.length; i++) {
+            yASK.add(ASK[i] + alfa * whiteNoise[i] * Math.exp(-beta * i));
+        }
+
+        return yASK;
+    }
+
+    public static List<Double> transmisionZad4_2(double[] ASK, double[] whiteNoise, int alfa, int beta) {
+        List<Double> yASK = new ArrayList<>();
+        for (int i = 0; i < ASK.length; i++) {
+            yASK.add(ASK[i] * Math.exp(-beta * i) + alfa * whiteNoise[i]);
+        }
+
+        return yASK;
+    }
+
     public static List<Integer> demodulationASK(List<Double> za) {
         double[] zASK = new double[N];
         for (int i = 0; i < zASK.length; i++) {
-            zASK[i] =   za.get(i) * Math.sin(2 * PI * fn * i / fs) ;
+            zASK[i] = za.get(i) * Math.sin(2 * PI * fn * i / fs) ;
         }
 
         double[] pASK = new double[N];
@@ -107,11 +135,7 @@ public class Main {
             }
         }
 
-        double h = 0;
-        for (int i = 0; i < tb*fs && i < N; i++) {
-            h += pASK[i];
-        }
-        h = 30;
+        double h = 30;
 
         double[] cASK = new double[N];
         for (int i = 0; i < N; i++) {
@@ -135,6 +159,41 @@ public class Main {
         return counterASK;
     }
 
+    public static List<Integer> decodeASK(List<Integer> demodulatedBits) {
+        List<Integer> decodedBits = new ArrayList<>();
+        List<Integer> temp = new ArrayList<>();
+        for (Integer demodulatedBit : demodulatedBits) {
+            temp.add(demodulatedBit);
+            if(temp.size() == 7) {
+                int x1P = temp.get(2) ^ temp.get(4) ^ temp.get(6);
+                int x2P = temp.get(2) ^ temp.get(5) ^ temp.get(6);
+                int x4P = temp.get(4) ^ temp.get(5) ^ temp.get(6);
+
+                int x1_ = temp.get(0) ^ x1P;
+                int x2_ = temp.get(1) ^ x2P;
+                int x4_ = temp.get(3) ^ x4P;
+
+                int s = (int) (x1_ * Math.pow(2, 0) + x2_ * Math.pow(2, 1) + x4_ * Math.pow(2, 2));
+                if (s == 0) System.out.println("There is no mistake");
+                else {
+                    System.out.println("The mistake is in: " + s + " bit");
+                    System.out.println("Making changes...");
+                    if (temp.get(s - 1) == 1) {
+                        temp.set(s - 1, 0);
+                    } else temp.set(s - 1, 1);
+                    System.out.println("Chosen word: " + temp);
+                }
+                decodedBits.add(temp.get(2));
+                decodedBits.add(temp.get(4));
+                decodedBits.add(temp.get(5));
+                decodedBits.add(temp.get(6));
+                temp.clear();
+            }
+        }
+
+        return decodedBits;
+    }
+
     public static double bitErrorRate(List<Integer> codedBits, List<Integer> decodedBits) {
         int error = 0;
         for (int i = 0; i < codedBits.size(); i++) {
@@ -143,26 +202,6 @@ public class Main {
             }
         }
         return (double) error / codedBits.size();
-    }
-
-    public static List<Double> transmisionZad2(double[] ASK, double[] whiteNoise, int beta) {
-        List<Double> yASK = new ArrayList<>();
-        double[] e = new double[ASK.length];
-        for (int i = 0; i < ASK.length; i++) {
-            yASK.add(ASK[i] * Math.exp(-beta * i));
-            e[i] = Math.exp(-beta * i);
-        }
-
-        XYChart chartCASK = new XYChartBuilder().width(1920).height(1080).title("Sygnały za").xAxisTitle("Czas").yAxisTitle("Wartość").build();
-        chartCASK.addSeries("Wartości", null, e).setMarker(SeriesMarkers.NONE);
-
-        try {
-            BitmapEncoder.saveBitmap(chartCASK, "src/Lab7/Exp.png", BitmapEncoder.BitmapFormat.PNG);
-        } catch (IOException exception) {
-            exception.printStackTrace();
-        }
-
-        return yASK;
     }
 
     public static double[] whiteNoise(int length) {
@@ -201,7 +240,9 @@ public class Main {
             bits.add(enteredBits.get(count));
             count++;
         }
+        System.out.println();
         System.out.println("Entered bits: " + enteredBits);
+        System.out.println();
         System.out.println("bits: " + bits);
 
         List<Integer> codedBits = new ArrayList<>();
@@ -225,8 +266,13 @@ public class Main {
 
         List<Integer> demodulatedBits = demodulationASK(ASK);
         System.out.println();
-        System.out.println(demodulatedBits);
+        System.out.println("Demodulated bits: " + demodulatedBits);
 
-        System.out.println(bitErrorRate(codedBits, demodulatedBits));
+        System.out.println();
+        System.out.println("BER: " + bitErrorRate(codedBits, demodulatedBits));
+
+        List<Integer> decodedBits = decodeASK(demodulatedBits);
+        System.out.println();
+        System.out.println("Decoded bits: " + decodedBits);
     }
 }
