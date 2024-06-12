@@ -76,8 +76,8 @@ public class Main {
             ofs = ofs + tbp;
         }
 
-        return transmisionZad2(za, whiteNoise(za.length),8);
-//        return transmisionZad1(za, whiteNoise(za.length),8);
+      //  return transmisionZad2(za, whiteNoise(za.length),8);
+        return transmisionZad1(za, whiteNoise(za.length),0);
     }
 
     public static List<Double> transmisionZad1(double[] ASK, double[] whiteNoise, int alfa) {
