@@ -5,14 +5,15 @@ import org.knowm.xchart.XYChart;
 import org.knowm.xchart.XYChartBuilder;
 import org.knowm.xchart.style.markers.SeriesMarkers;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 
 import static java.lang.Math.PI;
 
 public class Main {
-    public static double fs = 2000;
-    public static double tc = 6.0;
+    public static double fs = 1000;
+    public static double tc = 25.0;
     public static int N = (int) (fs * tc);
     public static int w = 2;
     public static double a1 = 1;
@@ -75,14 +76,23 @@ public class Main {
             ofs = ofs + tbp;
         }
 
-        return transmisionZad2(za, whiteNoise(za.length),0);
-//        return transmisionZad3(za, whiteNoise(za.length),8);
+        XYChart chartCASK = new XYChartBuilder().width(1920).height(1080).title("Sygnały za").xAxisTitle("Czas").yAxisTitle("Wartość").build();
+        chartCASK.addSeries("Wartości", null, za).setMarker(SeriesMarkers.NONE);
+
+        try {
+            BitmapEncoder.saveBitmap(chartCASK, "src/Lab7/za.png", BitmapEncoder.BitmapFormat.PNG);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+//        return transmisionZad2(za, whiteNoise(za.length), 1);
+        return transmisionZad3(za, 1);
 //        return transmisionZad4_1(za, whiteNoise(za.length), 0, 8);
 //        return transmisionZad4_2(za, whiteNoise(za.length), 0, 8);
     }
 
     public static List<Double> transmisionZad2(double[] ASK, double[] whiteNoise, int alfa) {
-        List<Double> yASK = new ArrayList<>();
+       List<Double> yASK = new ArrayList<>();
         for (int i = 0; i < ASK.length; i++) {
             yASK.add(ASK[i] + alfa * whiteNoise[i]);
         }
@@ -90,7 +100,7 @@ public class Main {
         return yASK;
     }
 
-    public static List<Double> transmisionZad3(double[] ASK, double[] whiteNoise, int beta) {
+    public static List<Double> transmisionZad3(double[] ASK, double beta) {
         List<Double> yASK = new ArrayList<>();
         for (int i = 0; i < ASK.length; i++) {
             yASK.add(ASK[i] * Math.exp(-beta * i));
@@ -135,7 +145,16 @@ public class Main {
             }
         }
 
-        double h = 30;
+        XYChart chartCASK = new XYChartBuilder().width(1920).height(1080).title("Sygnały za").xAxisTitle("Czas").yAxisTitle("Wartość").build();
+        chartCASK.addSeries("Wartości", null, pASK).setMarker(SeriesMarkers.NONE);
+
+        try {
+            BitmapEncoder.saveBitmap(chartCASK, "src/Lab7/pASK.png", BitmapEncoder.BitmapFormat.PNG);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        double h = 50;
 
         double[] cASK = new double[N];
         for (int i = 0; i < N; i++) {
@@ -152,7 +171,10 @@ public class Main {
             }
             if (oneCounterASK > Main.tbp/2-1) {
                 counterASK.add(1);
-            } else {counterASK.add(0);}
+            } else {
+                counterASK.add(0);
+            }
+
             oneCounterASK = 0;
         }
 
